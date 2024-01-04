@@ -1,10 +1,9 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:wheelz/methods/common_methods.dart';
 import 'package:wheelz/user/authentication/user_login.dart';
-import 'package:wheelz/user/pages/home_page.dart';
+import 'package:wheelz/user/pages/user_home.dart';
 import 'package:wheelz/widgets/loading_dialog.dart';
 
 class UserSignUp extends StatefulWidget {
@@ -77,7 +76,7 @@ class _UserSignUpState extends State<UserSignUp> {
     };
     usersRef.set(userDataMap);
 
-    Navigator.push(context, MaterialPageRoute(builder: (c) => const HomePage()));
+    Navigator.push(context, MaterialPageRoute(builder: (c) => const UserHome()));
   }
 
   @override

@@ -7,14 +7,14 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wheelz/global/global_var.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class UserHome extends StatefulWidget {
+  const UserHome({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<UserHome> createState() => _UserHomeState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _UserHomeState extends State<UserHome> {
   final Completer<GoogleMapController> googleMapCompleterController =
       Completer<GoogleMapController>();
   GoogleMapController? controllerGoogleMap;

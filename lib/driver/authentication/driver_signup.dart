@@ -9,8 +9,6 @@ import 'package:wheelz/methods/common_methods.dart';
 import 'package:wheelz/widgets/loading_dialog.dart';
 import 'driver_login.dart';
 
-
-
 class DriverSignUp extends StatefulWidget {
   const DriverSignUp({super.key});
 
@@ -18,76 +16,59 @@ class DriverSignUp extends StatefulWidget {
   State<DriverSignUp> createState() => _DriverSignUpState();
 }
 
-
-
-class _DriverSignUpState extends State<DriverSignUp>
-{
+class _DriverSignUpState extends State<DriverSignUp> {
   TextEditingController userNameTextEditingController = TextEditingController();
-  TextEditingController userPhoneTextEditingController = TextEditingController();
+  TextEditingController userPhoneTextEditingController =
+      TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
-  TextEditingController vehicleModelTextEditingController = TextEditingController();
-  TextEditingController vehicleColorTextEditingController = TextEditingController();
-  TextEditingController vehicleNumberTextEditingController = TextEditingController();
+  TextEditingController vehicleModelTextEditingController =
+      TextEditingController();
+  TextEditingController vehicleColorTextEditingController =
+      TextEditingController();
+  TextEditingController vehicleNumberTextEditingController =
+      TextEditingController();
   CommonMethods cMethods = CommonMethods();
   XFile? imageFile;
   String urlOfUploadedImage = "";
 
-
-  checkIfNetworkIsAvailable()
-  {
+  checkIfNetworkIsAvailable() {
     cMethods.checkConnectivity(context);
 
-    if(imageFile != null) //image validation
-    {
+    if (imageFile != null) {
       signUpFormValidation();
-    }
-    else
-    {
+    } else {
       cMethods.displaySnackBar("Please choose image first.", context);
     }
   }
 
-  signUpFormValidation()
-  {
-    if(userNameTextEditingController.text.trim().length < 3)
-    {
-      cMethods.displaySnackBar("your name must be atleast 4 or more characters.", context);
-    }
-    else if(userPhoneTextEditingController.text.trim().length < 7)
-    {
-      cMethods.displaySnackBar("your phone number must be atleast 8 or more characters.", context);
-    }
-    else if(!emailTextEditingController.text.contains("@"))
-    {
+  signUpFormValidation() {
+    if (userNameTextEditingController.text.trim().length < 3) {
+      cMethods.displaySnackBar(
+          "your name must be atleast 4 or more characters.", context);
+    } else if (userPhoneTextEditingController.text.trim().length < 7) {
+      cMethods.displaySnackBar(
+          "your phone number must be atleast 8 or more characters.", context);
+    } else if (!emailTextEditingController.text.contains("@")) {
       cMethods.displaySnackBar("please write valid email.", context);
-    }
-    else if(passwordTextEditingController.text.trim().length < 5)
-    {
-      cMethods.displaySnackBar("your password must be atleast 6 or more characters.", context);
-    }
-    else if(vehicleModelTextEditingController.text.trim().isEmpty)
-    {
+    } else if (passwordTextEditingController.text.trim().length < 5) {
+      cMethods.displaySnackBar(
+          "your password must be atleast 6 or more characters.", context);
+    } else if (vehicleModelTextEditingController.text.trim().isEmpty) {
       cMethods.displaySnackBar("please write your car model", context);
-    }
-    else if(vehicleColorTextEditingController.text.trim().isEmpty)
-    {
+    } else if (vehicleColorTextEditingController.text.trim().isEmpty) {
       cMethods.displaySnackBar("please write your car color.", context);
-    }
-    else if(vehicleNumberTextEditingController.text.isEmpty)
-    {
+    } else if (vehicleNumberTextEditingController.text.isEmpty) {
       cMethods.displaySnackBar("please write your car number.", context);
-    }
-    else
-    {
+    } else {
       uploadImageToStorage();
     }
   }
 
-  uploadImageToStorage() async
-  {
+  uploadImageToStorage() async {
     String imageIDName = DateTime.now().millisecondsSinceEpoch.toString();
-    Reference referenceImage = FirebaseStorage.instance.ref().child("Images").child(imageIDName);
+    Reference referenceImage =
+        FirebaseStorage.instance.ref().child("Images").child(imageIDName);
 
     UploadTask uploadTask = referenceImage.putFile(File(imageFile!.path));
     TaskSnapshot snapshot = await uploadTask;
@@ -96,43 +77,42 @@ class _DriverSignUpState extends State<DriverSignUp>
     setState(() {
       urlOfUploadedImage;
     });
-
     registerNewDriver();
   }
 
-  registerNewDriver() async
-  {
+  registerNewDriver() async {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) => LoadingDialog(messageText: "Registering your account..."),
+      builder: (BuildContext context) =>
+          LoadingDialog(messageText: "Registering your account..."),
     );
 
-    final User? userFirebase = (
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailTextEditingController.text.trim(),
-        password: passwordTextEditingController.text.trim(),
-      ).catchError((errorMsg)
-      {
-        Navigator.pop(context);
-        cMethods.displaySnackBar(errorMsg.toString(), context);
-      })
-    ).user;
+    final User? userFirebase = (await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+      email: emailTextEditingController.text.trim(),
+      password: passwordTextEditingController.text.trim(),
+    )
+            .catchError((errorMsg) {
+      Navigator.pop(context);
+      cMethods.displaySnackBar(errorMsg.toString(), context);
+    }))
+        .user;
 
-    if(!context.mounted) return;
+    if (!context.mounted) return;
     Navigator.pop(context);
+    DatabaseReference usersRef = FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(userFirebase!.uid);
 
-    DatabaseReference usersRef = FirebaseDatabase.instance.ref().child("drivers").child(userFirebase!.uid);
-
-    Map driverCarInfo =
-    {
+    Map driverCarInfo = {
       "carColor": vehicleColorTextEditingController.text.trim(),
       "carModel": vehicleModelTextEditingController.text.trim(),
       "carNumber": vehicleNumberTextEditingController.text.trim(),
     };
 
-    Map driverDataMap =
-    {
+    Map driverDataMap = {
       "photo": urlOfUploadedImage,
       "car_details": driverCarInfo,
       "name": userNameTextEditingController.text.trim(),
@@ -142,16 +122,15 @@ class _DriverSignUpState extends State<DriverSignUp>
       "blockStatus": "no",
     };
     usersRef.set(driverDataMap);
-
-    Navigator.push(context, MaterialPageRoute(builder: (c)=> Dashboard()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (c) => const Dashboard()));
   }
 
-  chooseImageFromGallery() async
-  {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+  chooseImageFromGallery() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    if(pickedFile != null)
-    {
+    if (pickedFile != null) {
       setState(() {
         imageFile = pickedFile;
       });
@@ -159,47 +138,44 @@ class _DriverSignUpState extends State<DriverSignUp>
   }
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
             children: [
-
               const SizedBox(
                 height: 40,
               ),
 
-              imageFile == null ?
-              const CircleAvatar(
-                radius: 86,
-                backgroundImage: AssetImage("assets/images/avatarman.png"),
-              ) : Container(
-                width: 180,
-                height: 180,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey,
-                  image: DecorationImage(
-                    fit: BoxFit.fitHeight,
-                    image: FileImage(
-                      File(
-                        imageFile!.path,
-                      ),
+              imageFile == null
+                  ? const CircleAvatar(
+                      radius: 86,
+                      backgroundImage:
+                          AssetImage("assets/images/avatarman.png"),
                     )
-                  )
-                ),
-              ),
+                  : Container(
+                      width: 180,
+                      height: 180,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.grey,
+                          image: DecorationImage(
+                              fit: BoxFit.fitHeight,
+                              image: FileImage(
+                                File(
+                                  imageFile!.path,
+                                ),
+                              ))),
+                    ),
 
               const SizedBox(
                 height: 10,
               ),
 
               GestureDetector(
-                onTap: ()
-                {
+                onTap: () {
                   chooseImageFromGallery();
                 },
                 child: const Text(
@@ -216,7 +192,6 @@ class _DriverSignUpState extends State<DriverSignUp>
                 padding: const EdgeInsets.all(22),
                 child: Column(
                   children: [
-
                     TextField(
                       controller: userNameTextEditingController,
                       keyboardType: TextInputType.text,
@@ -231,9 +206,9 @@ class _DriverSignUpState extends State<DriverSignUp>
                         fontSize: 15,
                       ),
                     ),
-
-                    const SizedBox(height: 22,),
-
+                    const SizedBox(
+                      height: 22,
+                    ),
                     TextField(
                       controller: userPhoneTextEditingController,
                       keyboardType: TextInputType.text,
@@ -248,9 +223,9 @@ class _DriverSignUpState extends State<DriverSignUp>
                         fontSize: 15,
                       ),
                     ),
-
-                    const SizedBox(height: 22,),
-
+                    const SizedBox(
+                      height: 22,
+                    ),
                     TextField(
                       controller: emailTextEditingController,
                       keyboardType: TextInputType.emailAddress,
@@ -265,9 +240,9 @@ class _DriverSignUpState extends State<DriverSignUp>
                         fontSize: 15,
                       ),
                     ),
-
-                    const SizedBox(height: 22,),
-
+                    const SizedBox(
+                      height: 22,
+                    ),
                     TextField(
                       controller: passwordTextEditingController,
                       obscureText: true,
@@ -283,9 +258,9 @@ class _DriverSignUpState extends State<DriverSignUp>
                         fontSize: 15,
                       ),
                     ),
-
-                    const SizedBox(height: 32,),
-
+                    const SizedBox(
+                      height: 32,
+                    ),
                     TextField(
                       controller: vehicleModelTextEditingController,
                       keyboardType: TextInputType.text,
@@ -300,9 +275,9 @@ class _DriverSignUpState extends State<DriverSignUp>
                         fontSize: 15,
                       ),
                     ),
-
-                    const SizedBox(height: 22,),
-
+                    const SizedBox(
+                      height: 22,
+                    ),
                     TextField(
                       controller: vehicleColorTextEditingController,
                       keyboardType: TextInputType.text,
@@ -317,9 +292,9 @@ class _DriverSignUpState extends State<DriverSignUp>
                         fontSize: 15,
                       ),
                     ),
-
-                    const SizedBox(height: 22,),
-
+                    const SizedBox(
+                      height: 22,
+                    ),
                     TextField(
                       controller: vehicleNumberTextEditingController,
                       keyboardType: TextInputType.text,
@@ -334,34 +309,32 @@ class _DriverSignUpState extends State<DriverSignUp>
                         fontSize: 15,
                       ),
                     ),
-
-                    const SizedBox(height: 22,),
-
+                    const SizedBox(
+                      height: 22,
+                    ),
                     ElevatedButton(
-                      onPressed: ()
-                      {
+                      onPressed: () {
                         checkIfNetworkIsAvailable();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple,
-                        padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 10)
-                      ),
-                      child: const Text(
-                        "Sign Up"
-                      ),
+                          backgroundColor: Colors.purple,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 80, vertical: 10)),
+                      child: const Text("Sign Up"),
                     ),
-
                   ],
                 ),
               ),
 
-              const SizedBox(height: 12,),
+              const SizedBox(
+                height: 12,
+              ),
 
               //textbutton
               TextButton(
-                onPressed: ()
-                {
-                  Navigator.push(context, MaterialPageRoute(builder: (c)=> const DriverLogin()));
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (c) => const DriverLogin()));
                 },
                 child: const Text(
                   "Already have an Account? Login Here",
@@ -370,7 +343,6 @@ class _DriverSignUpState extends State<DriverSignUp>
                   ),
                 ),
               ),
-
             ],
           ),
         ),

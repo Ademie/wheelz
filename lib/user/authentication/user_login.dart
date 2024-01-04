@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:wheelz/global/global_var.dart';
 import 'package:wheelz/user/authentication/user_signup.dart';
 import '../../methods/common_methods.dart';
-import '../pages/home_page.dart';
+import '../pages/user_home.dart';
 import '../../widgets/loading_dialog.dart';
 
 class UserLogin extends StatefulWidget {
@@ -66,7 +66,7 @@ class _UserLoginState extends State<UserLogin> {
           if ((snap.snapshot.value as Map)["blockStatus"] == "no") {
             userName = (snap.snapshot.value as Map)["name"];
             Navigator.push(
-                context, MaterialPageRoute(builder: (c) => HomePage()));
+                context, MaterialPageRoute(builder: (c) => const UserHome()));
           } else {
             FirebaseAuth.instance.signOut();
             cMethods.displaySnackBar(
