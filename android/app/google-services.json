@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "547102469282",
+    "project_id": "wheelz-dce67",
+    "storage_bucket": "wheelz-dce67.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547102469282:android:3ec65e2a0b7aa59460bbfb",
+        "android_client_info": {
+          "package_name": "ademie.wheelz"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVUmvANVjkjFptG7vc6RbhqUkpRNiwQ3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
