@@ -1,84 +1,83 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:wheelz/authentication/signup_screen.dart';
-import 'package:wheelz/global/global_var.dart';
-import '../methods/common_methods.dart';
-import '../pages/home_page.dart';
-import '../widgets/loading_dialog.dart';
+import 'package:wheelz/methods/common_methods.dart';
+import 'package:wheelz/user/authentication/user_login.dart';
+import 'package:wheelz/user/pages/home_page.dart';
+import 'package:wheelz/widgets/loading_dialog.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class UserSignUp extends StatefulWidget {
+  const UserSignUp({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<UserSignUp> createState() => _UserSignUpState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _UserSignUpState extends State<UserSignUp> {
+  TextEditingController userNameTextEditingController = TextEditingController();
+  TextEditingController userPhoneTextEditingController =
+      TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
   CommonMethods cMethods = CommonMethods();
 
   checkIfNetworkIsAvailable() {
     cMethods.checkConnectivity(context);
-    signInFormValidation();
+    signUpFormValidation();
   }
 
-  signInFormValidation() {
-    if (!emailTextEditingController.text.contains("@")) {
+  signUpFormValidation() {
+    if (userNameTextEditingController.text.trim().length < 3) {
+      cMethods.displaySnackBar(
+          "your name must be atleast 4 or more characters.", context);
+    } else if (userPhoneTextEditingController.text.trim().length < 7) {
+      cMethods.displaySnackBar(
+          "your phone number must be atleast 8 or more characters.", context);
+    } else if (!emailTextEditingController.text.contains("@")) {
       cMethods.displaySnackBar("please write valid email.", context);
     } else if (passwordTextEditingController.text.trim().length < 5) {
       cMethods.displaySnackBar(
           "your password must be atleast 6 or more characters.", context);
     } else {
-      signInUser();
+      registerNewUser();
     }
   }
 
-  signInUser() async {
+  registerNewUser() async {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) =>
-          LoadingDialog(messageText: "Allowing you to Login..."),
+          LoadingDialog(messageText: "Registering your account..."),
     );
+
     final User? userFirebase = (await FirebaseAuth.instance
-            .signInWithEmailAndPassword(
+            .createUserWithEmailAndPassword(
       email: emailTextEditingController.text.trim(),
       password: passwordTextEditingController.text.trim(),
     )
             .catchError((errorMsg) {
       Navigator.pop(context);
-      cMethods.displaySnackBar("Invalid email or password", context);
+      cMethods.displaySnackBar(errorMsg.toString(), context);
     }))
         .user;
 
     if (!context.mounted) return;
     Navigator.pop(context);
 
-    if (userFirebase != null) {
-      DatabaseReference usersRef = FirebaseDatabase.instance
-          .ref()
-          .child("users")
-          .child(userFirebase.uid);
-      usersRef.once().then((snap) {
-        if (snap.snapshot.value != null) {
-          if ((snap.snapshot.value as Map)["blockStatus"] == "no") {
-            userName = (snap.snapshot.value as Map)["name"];
-            Navigator.push(
-                context, MaterialPageRoute(builder: (c) => HomePage()));
-          } else {
-            FirebaseAuth.instance.signOut();
-            cMethods.displaySnackBar(
-                "you are blocked. Contact admin: alizeb875@gmail.com", context);
-          }
-        } else {
-          FirebaseAuth.instance.signOut();
-          cMethods.displaySnackBar(
-              "your record do not exists as a User.", context);
-        }
-      });
-    }
+    DatabaseReference usersRef =
+        FirebaseDatabase.instance.ref().child("users").child(userFirebase!.uid);
+    Map userDataMap = {
+      "name": userNameTextEditingController.text.trim(),
+      "email": emailTextEditingController.text.trim(),
+      "phone": userPhoneTextEditingController.text.trim(),
+      "id": userFirebase.uid,
+      "blockStatus": "no",
+    };
+    usersRef.set(userDataMap);
+
+    Navigator.push(context, MaterialPageRoute(builder: (c) => const HomePage()));
   }
 
   @override
@@ -92,17 +91,52 @@ class _LoginScreenState extends State<LoginScreen> {
               Image.asset("assets/images/logo.png"),
 
               const Text(
-                "Login as a User",
+                "Create a User\'s Account",
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
                 ),
               ),
+
               //text fields + button
               Padding(
                 padding: const EdgeInsets.all(22),
                 child: Column(
                   children: [
+                    TextField(
+                      controller: userNameTextEditingController,
+                      keyboardType: TextInputType.text,
+                      decoration: const InputDecoration(
+                        labelText: "User Name",
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 22,
+                    ),
+                    TextField(
+                      controller: userPhoneTextEditingController,
+                      keyboardType: TextInputType.text,
+                      decoration: const InputDecoration(
+                        labelText: "User Phone",
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 22,
+                    ),
                     TextField(
                       controller: emailTextEditingController,
                       keyboardType: TextInputType.emailAddress,
@@ -146,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           backgroundColor: Colors.purple,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 80, vertical: 10)),
-                      child: const Text("Login"),
+                      child: const Text("Sign Up"),
                     ),
                   ],
                 ),
@@ -155,14 +189,15 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(
                 height: 12,
               ),
+
               //textbutton
               TextButton(
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (c) => const SignUpScreen()));
+                      MaterialPageRoute(builder: (c) => const UserLogin()));
                 },
                 child: const Text(
-                  "Don\'t have an Account? Register Here",
+                  "Already have an Account? Login Here",
                   style: TextStyle(
                     color: Colors.grey,
                   ),
