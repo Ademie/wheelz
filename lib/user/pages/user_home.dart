@@ -10,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wheelz/global/global_var.dart';
 import 'package:wheelz/methods/common_methods.dart';
 import 'package:wheelz/user/authentication/user_login.dart';
+import 'package:wheelz/user/pages/search_destination_page.dart';
 
 class UserHome extends StatefulWidget {
   const UserHome({super.key});
@@ -25,6 +26,8 @@ class _UserHomeState extends State<UserHome> {
   Position? currentPositionOfUser;
   GlobalKey<ScaffoldState> sKey = GlobalKey<ScaffoldState>();
   CommonMethods cMethods = CommonMethods();
+  double searchContainerHeight = 276;
+  double bottomMapPadding = 0;
 
   void updateMapTheme(GoogleMapController controller) {
     getJsonFileFromThemes("themes/retro_style.json")
@@ -110,6 +113,7 @@ class _UserHomeState extends State<UserHome> {
                 color: Colors.grey,
                 thickness: 1,
               ),
+
               //header
               Container(
                 color: Colors.black54,
@@ -207,9 +211,9 @@ class _UserHomeState extends State<UserHome> {
       ),
       body: Stack(
         children: [
-          //google map
+          ///google map
           GoogleMap(
-            padding: const EdgeInsets.only(top: 26),
+            padding: EdgeInsets.only(top: 26, bottom: bottomMapPadding),
             mapType: MapType.normal,
             myLocationEnabled: true,
             initialCameraPosition: googlePlexInitialPosition,
@@ -219,11 +223,15 @@ class _UserHomeState extends State<UserHome> {
 
               googleMapCompleterController.complete(controllerGoogleMap);
 
+              setState(() {
+                bottomMapPadding = 300;
+              });
+
               getCurrentLiveLocationOfUser();
             },
           ),
 
-          //drawer button
+          ///drawer button
           Positioned(
             top: 36,
             left: 19,
@@ -252,6 +260,62 @@ class _UserHomeState extends State<UserHome> {
                     color: Colors.black87,
                   ),
                 ),
+              ),
+            ),
+          ),
+
+          ///search location icon button
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: -80,
+            child: Container(
+              height: searchContainerHeight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (c) => const SearchDestinationPage()));
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey,
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(24)),
+                    child: const Icon(
+                      Icons.search,
+                      color: Colors.white,
+                      size: 25,
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey,
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(24)),
+                    child: const Icon(
+                      Icons.home,
+                      color: Colors.white,
+                      size: 25,
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey,
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(24)),
+                    child: const Icon(
+                      Icons.work,
+                      color: Colors.white,
+                      size: 25,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
