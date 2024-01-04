@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wheelz/global/global_var.dart';
 
@@ -18,9 +18,10 @@ class _HomePageState extends State<HomePage> {
   final Completer<GoogleMapController> googleMapCompleterController =
       Completer<GoogleMapController>();
   GoogleMapController? controllerGoogleMap;
+  Position? currentPositionOfUser;
 
   void updateMapTheme(GoogleMapController controller) {
-    getJsonFileFromThemes("themes/night_style.json")
+    getJsonFileFromThemes("themes/retro_style.json")
         .then((value) => setGoogleMapStyle(value, controller));
   }
 
@@ -33,6 +34,28 @@ class _HomePageState extends State<HomePage> {
 
   setGoogleMapStyle(String googleMapStyle, GoogleMapController controller) {
     controller.setMapStyle(googleMapStyle);
+  }
+
+  // get location of user
+  getCurrentLiveLocationOfUser() async {
+    Position? positionOfUser;
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      positionOfUser = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.bestForNavigation);
+    } else if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
+      positionOfUser = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+    }
+    currentPositionOfUser = positionOfUser;
+
+    LatLng positionOfUserInLatLng = LatLng(
+        currentPositionOfUser!.latitude, currentPositionOfUser!.longitude);
+
+    CameraPosition cameraPosition =
+        CameraPosition(target: positionOfUserInLatLng, zoom: 15);
+    controllerGoogleMap!
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
   @override
@@ -48,6 +71,7 @@ class _HomePageState extends State<HomePage> {
               controllerGoogleMap = mapController;
               updateMapTheme(controllerGoogleMap!);
               googleMapCompleterController.complete(controllerGoogleMap);
+              getCurrentLiveLocationOfUser();
             },
           ),
         ],

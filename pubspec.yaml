@@ -18,6 +18,8 @@ dependencies:
   firebase_database:
   get: ^4.6.6
   google_maps_flutter: ^2.5.1
+  permission_handler: ^11.1.0
+  geolocator: ^10.1.0
   # firebase_storage:
 
 dev_dependencies:
@@ -29,6 +31,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - themes/
   #   - images/a_dot_ham.jpeg
 
   # fonts:

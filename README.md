@@ -20,3 +20,6 @@ wirekess debugging android
 Connect via USB: adb tcpip 5555.
 Disconnect USB, Get Phone Ip Address Settings > About Phone > Status.
 Now adb connect 172.20.10.14
+
+<!-- Map styles -->
+https://mapstyle.withgoogle.com/
