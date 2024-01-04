@@ -65,6 +65,10 @@ class _UserHomeState extends State<UserHome> {
         CameraPosition(target: positionOfUserInLatLng, zoom: 15);
     controllerGoogleMap!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    // ignore: use_build_context_synchronously
+    await CommonMethods.convertGeoGraphicCoOrdinatesIntoHumanReadableAddress(
+        currentPositionOfUser!, context);
+
     await getUserInfoAndCheckBlockStatus();
   }
 
