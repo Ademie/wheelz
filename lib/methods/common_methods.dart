@@ -3,8 +3,11 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:wheelz/global/global_var.dart';
+import 'package:wheelz/user/appInfo/app_info.dart';
+import 'package:wheelz/user/models/address_model.dart';
 
 class CommonMethods
 {
@@ -59,7 +62,13 @@ class CommonMethods
     if(responseFromAPI != "error")
     {
       humanReadableAddress = responseFromAPI["results"][0]["formatted_address"];
-      print("humanReadableAddress = $humanReadableAddress");
+
+      AddressModel model = AddressModel();
+      model.humanReadableAddress = humanReadableAddress;
+      model.longitudePosition = position.longitude;
+      model.latitudePosition = position.latitude;
+
+      Provider.of<AppInfo>(context, listen: false).updatePickUpLocation(model);
     }
 
     return humanReadableAddress;
