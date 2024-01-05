@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -24,48 +26,6 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
   TextEditingController destinationTextEditingController =
       TextEditingController();
   List<PredictionModel> dropOffPredictionsPlacesList = [];
-
-  LatLngBounds searchBounds = LatLngBounds(
-    southwest: LatLng(5.159025192260743, 5.110745429992677),
-    northeast: LatLng(7.314114433544155, 7.288488878494806),
-  );
-
-  searchLocation(String locationName, LatLngBounds bounds) async {
-    if (locationName.length > 1) {
-      LatLng centralPoint = LatLng(7.3, 5.1);
-
-      double radius = 0.5; // Adjust this value based on your desired radius
-      double minLat = centralPoint.latitude - radius;
-      double maxLat = centralPoint.latitude + radius;
-      double minLon = centralPoint.longitude - radius;
-      double maxLon = centralPoint.longitude + radius;
-
-      String apiPlacesUrl =
-          "https://nominatim.openstreetmap.org/search?format=json&q=$locationName&viewbox=$minLon,$minLat,$maxLon,$maxLat&bounded=1&limit=40";
-
-      var responseFromPlacesAPI =
-          await CommonMethods.sendRequestToAPI(apiPlacesUrl);
-
-      if (responseFromPlacesAPI == "error") {
-        return;
-      }
-
-      print(responseFromPlacesAPI);
-
-      if (responseFromPlacesAPI is List && responseFromPlacesAPI.isNotEmpty) {
-        var predictionsList = responseFromPlacesAPI.map((place) {
-          String name = place['name'] ?? '';
-          String display = place['display_name'] ?? '';
-          return PredictionModel(main_text: name, secondary_text: display);
-        }).toList();
-
-        setState(() {
-          dropOffPredictionsPlacesList = predictionsList;
-        });
-      }
-    }
-  }
-
   List<SearchInfo> items = [];
 
   void placeAutoComplete(String val) async {
@@ -77,14 +37,46 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
   }
 
   Future<List<SearchInfo>> addressSuggestion(String address) async {
-    Response response = await Dio().get(
-        "https://photon.komoot.io/api/?q=$address&lat=7.3045349&lon=5.1294792",
-        queryParameters: {"q": address, "limit": 10});
+    try {
+      // Central geopoint
+      double latitude = 7.3045349;
+      double longitude = 5.1294792;
+      int limit = 10;
 
-    final json = response.data;
-    return (json["features"] as List)
-        .map((e) => SearchInfo.fromJson(e))
-        .toList();
+      Response response = await Dio().get(
+        "https://photon.komoot.io/api/",
+        queryParameters: {
+          "q": address,
+          "lat": latitude,
+          "lon": longitude,
+          "limit": limit,
+        },
+      );
+
+      final responseData = response.data;
+
+      if (responseData is Map) {
+        var featuresList = List.from(responseData["features"] ?? []);
+        var predictionsList = featuresList.map((place) {
+          String name = place['properties']['name'] ?? '';
+          return PredictionModel(main_text: name);
+        }).toList();
+
+        setState(() {
+          dropOffPredictionsPlacesList = predictionsList;
+        });
+
+        return featuresList
+            .map((feature) => SearchInfo.fromJson(feature))
+            .toList();
+      } else {
+        log("Invalid response format: $responseData");
+        return [];
+      }
+    } catch (e) {
+      log("Error in addressSuggestion: $e");
+      return [];
+    }
   }
 
   @override
@@ -219,9 +211,7 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
                                         placeAutoComplete(inputText);
                                       } else {
                                         items.clear();
-                                        setState(() {
-                                          
-                                        });
+                                        setState(() {});
                                       }
                                     },
                                     decoration: const InputDecoration(
@@ -243,12 +233,12 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
                   ),
                 ),
               ),
-              ...items
-                  .map((e) => ListTile(
-                        leading: const Icon(Icons.place),
-                        title: Text(e.properties!.name!),
-                      ))
-                  .toList(),
+              // ...items
+              //     .map((e) => ListTile(
+              //           leading: const Icon(Icons.place),
+              //           title: Text(e.properties!.name!),
+              //         ))
+              //     .toList(),
               //display prediction results for destination place
               (dropOffPredictionsPlacesList.length > 0)
                   ? Padding(

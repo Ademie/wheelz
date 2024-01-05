@@ -39,7 +39,6 @@ class _UserHomeState extends State<UserHome> {
     // LatLng positionOfUserInLatLng = LatLng(
     //     currentPositionOfUser!.latitude, currentPositionOfUser!.longitude);
 
-    "location";
     // ignore: use_build_context_synchronously
     await CommonMethods.convertGeoGraphicCoOrdinatesIntoHumanReadableAddress(
         currentPositionOfUser!, context);
