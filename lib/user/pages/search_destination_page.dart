@@ -52,7 +52,7 @@ class _SearchDestinationPageState extends State<SearchDestinationPage>
   @override
   Widget build(BuildContext context)
   {
-    String userAddress = Provider.of<AppInfo>(context, listen: false).pickUpLocation!.humanReadableAddress ?? "";
+    String userAddress = Provider.of<AppInfo>(context, listen: false).pickUpLocation!.humanReadableAddress ?? "location";
     pickUpTextEditingController.text = userAddress;
 
     return Scaffold(

@@ -23,3 +23,5 @@ Now adb connect 172.20.10.14
 
 <!-- Map styles -->
 https://mapstyle.withgoogle.com/
+
+https://github.com/kiko-g/feup-esof/tree/master?tab=readme-ov-file

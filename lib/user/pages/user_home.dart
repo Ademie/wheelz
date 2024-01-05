@@ -10,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wheelz/global/global_var.dart';
 import 'package:wheelz/methods/common_methods.dart';
 import 'package:wheelz/user/authentication/user_login.dart';
+import 'package:wheelz/user/pages/user_map.dart';
 import 'package:wheelz/user/pages/search_destination_page.dart';
 
 class UserHome extends StatefulWidget {
@@ -28,6 +29,11 @@ class _UserHomeState extends State<UserHome> {
   CommonMethods cMethods = CommonMethods();
   double searchContainerHeight = 276;
   double bottomMapPadding = 0;
+
+  LatLngBounds bounds = LatLngBounds(
+    southwest: const LatLng(7.25, 5.20),
+    northeast: const LatLng(7.25, 5.20),
+  );
 
   void updateMapTheme(GoogleMapController controller) {
     getJsonFileFromThemes("themes/retro_style.json")
@@ -85,7 +91,6 @@ class _UserHomeState extends State<UserHome> {
           });
         } else {
           FirebaseAuth.instance.signOut();
-
           Navigator.push(
               context, MaterialPageRoute(builder: (c) => const UserLogin()));
 
@@ -216,25 +221,24 @@ class _UserHomeState extends State<UserHome> {
       body: Stack(
         children: [
           ///google map
-          GoogleMap(
-            padding: EdgeInsets.only(top: 26, bottom: bottomMapPadding),
-            mapType: MapType.normal,
-            myLocationEnabled: true,
-            initialCameraPosition: googlePlexInitialPosition,
-            onMapCreated: (GoogleMapController mapController) {
-              controllerGoogleMap = mapController;
-              updateMapTheme(controllerGoogleMap!);
-
-              googleMapCompleterController.complete(controllerGoogleMap);
-
-              setState(() {
-                bottomMapPadding = 300;
-              });
-
-              getCurrentLiveLocationOfUser();
-            },
-          ),
-
+          // GoogleMap(
+          //   padding: EdgeInsets.only(top: 26, bottom: bottomMapPadding),
+          //   mapType: MapType.normal,
+          //   myLocationEnabled: true,
+          //   // cameraTargetBounds: CameraTargetBounds(bounds),
+          //   indoorViewEnabled: true,
+          //   initialCameraPosition: googlePlexInitialPosition,
+          //   onMapCreated: (GoogleMapController mapController) {
+          //     controllerGoogleMap = mapController;
+          //     updateMapTheme(controllerGoogleMap!);
+          //     googleMapCompleterController.complete(controllerGoogleMap);
+          //     setState(() {
+          //       bottomMapPadding = 300;
+          //     });
+          //     getCurrentLiveLocationOfUser();
+          //   },
+          // ),
+          const UserMap(),
           ///drawer button
           Positioned(
             top: 36,
