@@ -1,12 +1,10 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:wheelz/global/global_var.dart';
 import 'package:wheelz/methods/common_methods.dart';
 import 'package:wheelz/user/authentication/user_login.dart';
@@ -21,35 +19,11 @@ class UserHome extends StatefulWidget {
 }
 
 class _UserHomeState extends State<UserHome> {
-  final Completer<GoogleMapController> googleMapCompleterController =
-      Completer<GoogleMapController>();
-  GoogleMapController? controllerGoogleMap;
   Position? currentPositionOfUser;
   GlobalKey<ScaffoldState> sKey = GlobalKey<ScaffoldState>();
   CommonMethods cMethods = CommonMethods();
   double searchContainerHeight = 276;
   double bottomMapPadding = 0;
-
-  LatLngBounds bounds = LatLngBounds(
-    southwest: const LatLng(7.25, 5.20),
-    northeast: const LatLng(7.25, 5.20),
-  );
-
-  void updateMapTheme(GoogleMapController controller) {
-    getJsonFileFromThemes("themes/retro_style.json")
-        .then((value) => setGoogleMapStyle(value, controller));
-  }
-
-  Future<String> getJsonFileFromThemes(String mapStylePath) async {
-    ByteData byteData = await rootBundle.load(mapStylePath);
-    var list = byteData.buffer
-        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
-    return utf8.decode(list);
-  }
-
-  setGoogleMapStyle(String googleMapStyle, GoogleMapController controller) {
-    controller.setMapStyle(googleMapStyle);
-  }
 
   // get location of user
   getCurrentLiveLocationOfUser() async {
@@ -64,17 +38,13 @@ class _UserHomeState extends State<UserHome> {
     }
     currentPositionOfUser = positionOfUser;
 
-    LatLng positionOfUserInLatLng = LatLng(
-        currentPositionOfUser!.latitude, currentPositionOfUser!.longitude);
+    // LatLng positionOfUserInLatLng = LatLng(
+    //     currentPositionOfUser!.latitude, currentPositionOfUser!.longitude);
 
-    CameraPosition cameraPosition =
-        CameraPosition(target: positionOfUserInLatLng, zoom: 15);
-    controllerGoogleMap!
-        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    "location";
     // ignore: use_build_context_synchronously
     await CommonMethods.convertGeoGraphicCoOrdinatesIntoHumanReadableAddress(
         currentPositionOfUser!, context);
-
     await getUserInfoAndCheckBlockStatus();
   }
 
@@ -108,6 +78,9 @@ class _UserHomeState extends State<UserHome> {
 
   @override
   Widget build(BuildContext context) {
+    getCurrentLiveLocationOfUser();
+   
+
     return Scaffold(
       key: sKey,
       drawer: Container(
@@ -167,7 +140,6 @@ class _UserHomeState extends State<UserHome> {
                   ),
                 ),
               ),
-
               const Divider(
                 height: 1,
                 color: Colors.grey,
@@ -220,25 +192,31 @@ class _UserHomeState extends State<UserHome> {
       ),
       body: Stack(
         children: [
+          const UserMap(
+            
+          ),
+
           ///google map
           // GoogleMap(
           //   padding: EdgeInsets.only(top: 26, bottom: bottomMapPadding),
           //   mapType: MapType.normal,
           //   myLocationEnabled: true,
-          //   // cameraTargetBounds: CameraTargetBounds(bounds),
-          //   indoorViewEnabled: true,
           //   initialCameraPosition: googlePlexInitialPosition,
-          //   onMapCreated: (GoogleMapController mapController) {
-          //     controllerGoogleMap = mapController;
-          //     updateMapTheme(controllerGoogleMap!);
-          //     googleMapCompleterController.complete(controllerGoogleMap);
-          //     setState(() {
-          //       bottomMapPadding = 300;
-          //     });
-          //     getCurrentLiveLocationOfUser();
+          //   onMapCreated: (GoogleMapController mapController)
+          //   {
+          //     // controllerGoogleMap = mapController;
+          //     // updateMapTheme(controllerGoogleMap!);
+
+          //     // googleMapCompleterController.complete(controllerGoogleMap);
+
+          //     // setState(() {
+          //     //   bottomMapPadding = 300;
+          //     // });
+
+          //     // getCurrentLiveLocationOfUser();
           //   },
           // ),
-          const UserMap(),
+
           ///drawer button
           Positioned(
             top: 36,
@@ -284,10 +262,10 @@ class _UserHomeState extends State<UserHome> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (c) => const SearchDestinationPage()));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return const SearchDestinationPage();
+                      }));
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey,

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:wheelz/firebase_options.dart';
 import 'package:wheelz/splash/splash_screen.dart';
 import 'package:wheelz/user/appInfo/app_info.dart';
-import 'package:wheelz/user/pages/user_map.dart';
+
 import 'package:wheelz/user/pages/user_home.dart';
 
 Future<void> main() async {

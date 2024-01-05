@@ -5,7 +5,6 @@ String googleMapKey = "AIzaSyAkF85sNBUpejsKnDFKOeA_kVDdKX2onnU";
 const CameraPosition googlePlexInitialPosition = CameraPosition(
   target: LatLng(7.25, 5.20),
   zoom: 14.4746,
-  // zoom: 7
 );
 
 
