@@ -15,13 +15,28 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-
 wirekess debugging android
 Connect via USB: adb tcpip 5555.
 Disconnect USB, Get Phone Ip Address Settings > About Phone > Status.
 Now adb connect 172.20.10.14
 
 <!-- Map styles -->
+
 https://mapstyle.withgoogle.com/
 
 https://github.com/kiko-g/feup-esof/tree/master?tab=readme-ov-file
+
+/ initPosition:
+// GeoPoint(latitude: 7.3045349, longitude: 5.1294792731864955),
+// areaLimit: BoundingBox(
+// east: 5.1496914,
+// north: 7.2928867,
+// south: 5.1132238,
+// west: 7.3152956,
+// ),
+
+
+photon.komoot.io/api/?q=akure&lat=7.3045349&lon=5.1294792
+
+
+https://photon.komoot.io/api/?q=futa&lat=7.3045349&lon=5.1294792

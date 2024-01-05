@@ -1,8 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:wheelz/global/global_var.dart';
 import 'package:wheelz/methods/common_methods.dart';
 import 'package:wheelz/user/models/prediction_model.dart';
+import 'package:wheelz/user/models/search_info.dart';
 import 'package:wheelz/widgets/prediction_place_ui.dart';
 
 import '../appInfo/app_info.dart';
@@ -15,16 +18,30 @@ class SearchDestinationPage extends StatefulWidget {
 }
 
 class _SearchDestinationPageState extends State<SearchDestinationPage> {
+  var accessToken =
+      'pk.eyJ1IjoiamVhZnJlZXp5IiwiYSI6ImNrYmpicjczYjBucjIyeGxzNGRjNHMxejEifQ.bY_8hqCiG-LBMG1xXreqdA';
   TextEditingController pickUpTextEditingController = TextEditingController();
   TextEditingController destinationTextEditingController =
       TextEditingController();
   List<PredictionModel> dropOffPredictionsPlacesList = [];
 
-  ///Places API - Place AutoComplete
-  searchLocation(String locationName) async {
+  LatLngBounds searchBounds = LatLngBounds(
+    southwest: LatLng(5.159025192260743, 5.110745429992677),
+    northeast: LatLng(7.314114433544155, 7.288488878494806),
+  );
+
+  searchLocation(String locationName, LatLngBounds bounds) async {
     if (locationName.length > 1) {
+      LatLng centralPoint = LatLng(7.3, 5.1);
+
+      double radius = 0.5; // Adjust this value based on your desired radius
+      double minLat = centralPoint.latitude - radius;
+      double maxLat = centralPoint.latitude + radius;
+      double minLon = centralPoint.longitude - radius;
+      double maxLon = centralPoint.longitude + radius;
+
       String apiPlacesUrl =
-          "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$locationName&key=$googleMapKey&components=country:ae";
+          "https://nominatim.openstreetmap.org/search?format=json&q=$locationName&viewbox=$minLon,$minLat,$maxLon,$maxLat&bounded=1&limit=40";
 
       var responseFromPlacesAPI =
           await CommonMethods.sendRequestToAPI(apiPlacesUrl);
@@ -33,18 +50,41 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
         return;
       }
 
-      if (responseFromPlacesAPI["status"] == "OK") {
-        var predictionResultInJson = responseFromPlacesAPI["predictions"];
-        var predictionsList = (predictionResultInJson as List)
-            .map((eachPlacePrediction) =>
-                PredictionModel.fromJson(eachPlacePrediction))
-            .toList();
+      print(responseFromPlacesAPI);
+
+      if (responseFromPlacesAPI is List && responseFromPlacesAPI.isNotEmpty) {
+        var predictionsList = responseFromPlacesAPI.map((place) {
+          String name = place['name'] ?? '';
+          String display = place['display_name'] ?? '';
+          return PredictionModel(main_text: name, secondary_text: display);
+        }).toList();
 
         setState(() {
           dropOffPredictionsPlacesList = predictionsList;
         });
       }
     }
+  }
+
+  List<SearchInfo> items = [];
+
+  void placeAutoComplete(String val) async {
+    await addressSuggestion(val).then((value) {
+      setState(() {
+        items = value;
+      });
+    });
+  }
+
+  Future<List<SearchInfo>> addressSuggestion(String address) async {
+    Response response = await Dio().get(
+        "https://photon.komoot.io/api/?q=$address&lat=7.3045349&lon=5.1294792",
+        queryParameters: {"q": address, "limit": 10});
+
+    final json = response.data;
+    return (json["features"] as List)
+        .map((e) => SearchInfo.fromJson(e))
+        .toList();
   }
 
   @override
@@ -56,7 +96,6 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
           String userAddress = appInfo.pickUpLocation!.humanReadableAddress!;
           pickUpTextEditingController.text = userAddress;
         }
-
         return SingleChildScrollView(
           child: Column(
             children: [
@@ -175,7 +214,15 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
                                     controller:
                                         destinationTextEditingController,
                                     onChanged: (inputText) {
-                                      searchLocation(inputText);
+                                      // searchLocation(inputText, searchBounds);
+                                      if (inputText != "") {
+                                        placeAutoComplete(inputText);
+                                      } else {
+                                        items.clear();
+                                        setState(() {
+                                          
+                                        });
+                                      }
                                     },
                                     decoration: const InputDecoration(
                                         hintText: "Destination Address",
@@ -196,7 +243,12 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
                   ),
                 ),
               ),
-
+              ...items
+                  .map((e) => ListTile(
+                        leading: const Icon(Icons.place),
+                        title: Text(e.properties!.name!),
+                      ))
+                  .toList(),
               //display prediction results for destination place
               (dropOffPredictionsPlacesList.length > 0)
                   ? Padding(
