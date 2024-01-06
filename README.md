@@ -40,3 +40,7 @@ https://github.com/kiko-g/feup-esof/tree/master?tab=readme-ov-file
 AutoComplete
 https://photon.komoot.io/api/?q=futa&lat=7.3045349&lon=5.1294792
 https://www.youtube.com/watch?v=Ye312X0pQqk
+
+ROUTING
+https://www.youtube.com/watch?v=k0kDJfdPSvc
+https://github.com/reussiteforever/Flutter_map_with_OpenRouteService/tree/main/lib

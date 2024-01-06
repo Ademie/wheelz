@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wheelz/driver/pages/driver_home.dart';
 import 'package:wheelz/driver/pages/earnings_page.dart';
 import 'package:wheelz/driver/pages/profile_page.dart';
 import 'package:wheelz/driver/pages/trips_page.dart';
@@ -50,7 +49,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         physics: const NeverScrollableScrollPhysics(),
         controller: controller,
         children: const [
-          DriverHome(),
+          // DriverHome(),
           EarningsPage(),
           TripsPage(),
           ProfilePage(),

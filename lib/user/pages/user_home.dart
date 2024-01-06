@@ -1,11 +1,18 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:wheelz/global/global_var.dart';
 import 'package:wheelz/methods/common_methods.dart';
+import 'package:wheelz/user/appInfo/app_info.dart';
 import 'package:wheelz/user/authentication/user_login.dart';
+import 'package:wheelz/user/models/direction_details.dart';
+import 'package:wheelz/user/models/online_nearby_drivers.dart';
 import 'package:wheelz/user/pages/user_map.dart';
 import 'package:wheelz/user/pages/search_destination_page.dart';
 
@@ -19,9 +26,25 @@ class UserHome extends StatefulWidget {
 class _UserHomeState extends State<UserHome> {
   Position? currentPositionOfUser;
   GlobalKey<ScaffoldState> sKey = GlobalKey<ScaffoldState>();
+  MapController? mapController;
   CommonMethods cMethods = CommonMethods();
   double searchContainerHeight = 276;
   double bottomMapPadding = 0;
+  double rideDetailsContainerHeight = 0;
+  double requestContainerHeight = 0;
+  double tripContainerHeight = 0;
+  DirectionDetails? tripDirectionDetailsInfo;
+  List<LatLng> polylineCoOrdinates = [];
+  Set<Polyline> polylineSet = {};
+  Set<Marker> markerSet = {};
+  Set<Circle> circleSet = {};
+  bool isDrawerOpened = true;
+  String stateOfApp = "normal";
+  bool nearbyOnlineDriversKeysLoaded = false;
+  DatabaseReference? tripRequestRef;
+  List<OnlineNearbyDrivers>? availableNearbyOnlineDriversList;
+  StreamSubscription<DatabaseEvent>? tripStreamSubscription;
+  bool requestingDirectionDetailsInfo = false;
 
   // get location of user
   getCurrentLiveLocationOfUser() async {
@@ -35,14 +58,15 @@ class _UserHomeState extends State<UserHome> {
           desiredAccuracy: LocationAccuracy.high);
     }
     currentPositionOfUser = positionOfUser;
-
-    // LatLng positionOfUserInLatLng = LatLng(
-    //     currentPositionOfUser!.latitude, currentPositionOfUser!.longitude);
+    AppInfo().currentPositionOfUser = currentPositionOfUser;
+    
 
     // ignore: use_build_context_synchronously
     await CommonMethods.convertGeoGraphicCoOrdinatesIntoHumanReadableAddress(
         currentPositionOfUser!, context);
     await getUserInfoAndCheckBlockStatus();
+
+    // await initializeGeoFireListener();
   }
 
   getUserInfoAndCheckBlockStatus() async {
@@ -55,6 +79,7 @@ class _UserHomeState extends State<UserHome> {
         if ((snap.snapshot.value as Map)["blockStatus"] == "no") {
           setState(() {
             userName = (snap.snapshot.value as Map)["name"];
+            userPhone = (snap.snapshot.value as Map)["phone"];
           });
         } else {
           FirebaseAuth.instance.signOut();
@@ -188,7 +213,9 @@ class _UserHomeState extends State<UserHome> {
       ),
       body: Stack(
         children: [
-          const UserMap(),
+          UserMap(
+            mapController: mapController,
+          ),
 
           ///drawer button
           Positioned(

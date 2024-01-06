@@ -1,11 +1,7 @@
 import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:wheelz/global/global_var.dart';
-import 'package:wheelz/methods/common_methods.dart';
 import 'package:wheelz/user/models/prediction_model.dart';
 import 'package:wheelz/user/models/search_info.dart';
 import 'package:wheelz/widgets/prediction_place_ui.dart';
@@ -233,14 +229,7 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
                   ),
                 ),
               ),
-              // ...items
-              //     .map((e) => ListTile(
-              //           leading: const Icon(Icons.place),
-              //           title: Text(e.properties!.name!),
-              //         ))
-              //     .toList(),
-              //display prediction results for destination place
-              (dropOffPredictionsPlacesList.length > 0)
+              (dropOffPredictionsPlacesList.isNotEmpty)
                   ? Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 16),
