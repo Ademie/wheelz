@@ -8,8 +8,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:wheelz/global/global_var.dart';
+import 'package:wheelz/global/singleton.dart';
 import 'package:wheelz/methods/common_methods.dart';
-import 'package:wheelz/user/appInfo/app_info.dart';
 import 'package:wheelz/user/authentication/user_login.dart';
 import 'package:wheelz/user/models/direction_details.dart';
 import 'package:wheelz/user/models/online_nearby_drivers.dart';
@@ -22,6 +22,8 @@ class UserHome extends StatefulWidget {
   @override
   State<UserHome> createState() => _UserHomeState();
 }
+
+Position? currentPositionOfUser;
 
 class _UserHomeState extends State<UserHome> {
   Position? currentPositionOfUser;
@@ -58,9 +60,7 @@ class _UserHomeState extends State<UserHome> {
           desiredAccuracy: LocationAccuracy.high);
     }
     currentPositionOfUser = positionOfUser;
-    AppInfo().currentPositionOfUser = currentPositionOfUser;
-    
-
+    Singleton().pickUp = positionOfUser;
     // ignore: use_build_context_synchronously
     await CommonMethods.convertGeoGraphicCoOrdinatesIntoHumanReadableAddress(
         currentPositionOfUser!, context);
@@ -101,7 +101,6 @@ class _UserHomeState extends State<UserHome> {
   @override
   Widget build(BuildContext context) {
     getCurrentLiveLocationOfUser();
-
     return Scaffold(
       key: sKey,
       drawer: Container(
@@ -116,7 +115,6 @@ class _UserHomeState extends State<UserHome> {
                 color: Colors.grey,
                 thickness: 1,
               ),
-
               //header
               Container(
                 color: Colors.black54,
@@ -213,9 +211,7 @@ class _UserHomeState extends State<UserHome> {
       ),
       body: Stack(
         children: [
-          UserMap(
-            mapController: mapController,
-          ),
+          const UserMap(),
 
           ///drawer button
           Positioned(

@@ -55,13 +55,17 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
         var featuresList = List.from(responseData["features"] ?? []);
         var predictionsList = featuresList.map((place) {
           String name = place['properties']['name'] ?? '';
-          return PredictionModel(main_text: name);
+          return PredictionModel(
+            main_text: name,
+            lat: place["geometry"]["coordinates"][0],
+            long: place["geometry"]["coordinates"][1],
+            secondary_text: name,
+          );
         }).toList();
 
-        setState(() {
-          dropOffPredictionsPlacesList = predictionsList;
-        });
-
+        // setState(() {
+        dropOffPredictionsPlacesList = predictionsList;
+        // });
         return featuresList
             .map((feature) => SearchInfo.fromJson(feature))
             .toList();
@@ -202,7 +206,6 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
                                     controller:
                                         destinationTextEditingController,
                                     onChanged: (inputText) {
-                                      // searchLocation(inputText, searchBounds);
                                       if (inputText != "") {
                                         placeAutoComplete(inputText);
                                       } else {
