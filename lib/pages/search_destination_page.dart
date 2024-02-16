@@ -1,9 +1,8 @@
-import 'dart:developer';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wheelz/user/models/prediction_model.dart';
-import 'package:wheelz/user/models/search_info.dart';
+import 'package:wheelz/global/global_var.dart';
+import 'package:wheelz/methods/common_methods.dart';
+import 'package:wheelz/models/prediction_model.dart';
 import 'package:wheelz/widgets/prediction_place_ui.dart';
 
 import '../appInfo/app_info.dart';
@@ -16,79 +15,60 @@ class SearchDestinationPage extends StatefulWidget {
 }
 
 class _SearchDestinationPageState extends State<SearchDestinationPage> {
-  var accessToken =
-      'pk.eyJ1IjoiamVhZnJlZXp5IiwiYSI6ImNrYmpicjczYjBucjIyeGxzNGRjNHMxejEifQ.bY_8hqCiG-LBMG1xXreqdA';
   TextEditingController pickUpTextEditingController = TextEditingController();
   TextEditingController destinationTextEditingController =
       TextEditingController();
   List<PredictionModel> dropOffPredictionsPlacesList = [];
-  List<SearchInfo> items = [];
 
-  void placeAutoComplete(String val) async {
-    await addressSuggestion(val).then((value) {
-      setState(() {
-        items = value;
-      });
-    });
-  }
+  ///Places API - Place AutoComplete
+  searchLocation(String locationName) async {
+    if (locationName.length > 1) {
+      String apiPlacesUrl =
+      "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$locationName&key=$googleMapKey";
+          // "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$locationName&key=$googleMapKey&components=country:ng";
 
-  Future<List<SearchInfo>> addressSuggestion(String address) async {
-    try {
-      // Central geopoint
-      double latitude = 7.3045349;
-      double longitude = 5.1294792;
-      int limit = 10;
+      var responseFromPlacesAPI =
+          await CommonMethods.sendRequestToAPI(apiPlacesUrl);
 
-      Response response = await Dio().get(
-        "https://photon.komoot.io/api/",
-        queryParameters: {
-          "q": address,
-          "lat": latitude,
-          "lon": longitude,
-          "limit": limit,
-        },
-      );
-
-      final responseData = response.data;
-
-      if (responseData is Map) {
-        var featuresList = List.from(responseData["features"] ?? []);
-        var predictionsList = featuresList.map((place) {
-          String name = place['properties']['name'] ?? '';
-          return PredictionModel(
-            main_text: name,
-            lat: place["geometry"]["coordinates"][0],
-            long: place["geometry"]["coordinates"][1],
-            secondary_text: name,
-          );
-        }).toList();
-
-        // setState(() {
-        dropOffPredictionsPlacesList = predictionsList;
-        // });
-        return featuresList
-            .map((feature) => SearchInfo.fromJson(feature))
-            .toList();
-      } else {
-        log("Invalid response format: $responseData");
-        return [];
+      if (responseFromPlacesAPI == "error") {
+        return;
       }
-    } catch (e) {
-      log("Error in addressSuggestion: $e");
-      return [];
+
+      if (responseFromPlacesAPI["status"] == "OK") {
+        var predictionResultInJson = responseFromPlacesAPI["predictions"];
+        var predictionsList = (predictionResultInJson as List)
+            .map((eachPlacePrediction) =>
+                PredictionModel.fromJson(eachPlacePrediction))
+            .toList();
+
+        setState(() {
+          dropOffPredictionsPlacesList = predictionsList;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Consumer<AppInfo>(builder: (context, appInfo, _) {
-        if (appInfo.pickUpLocation != null &&
-            appInfo.pickUpLocation!.humanReadableAddress != null) {
-          String userAddress = appInfo.pickUpLocation!.humanReadableAddress!;
-          pickUpTextEditingController.text = userAddress;
-        }
-        return SingleChildScrollView(
+    // String userAddress = Provider.of<AppInfo>(context, listen: false)
+    //         .pickUpLocation!
+    //         .humanReadableAddress ??
+    //     "";
+    // String userAddress = Provider.of<AppInfo>(context, listen: false)
+    //         .pickUpLocation
+    //         ?.humanReadableAddress ??
+    //     "address";
+
+    // pickUpTextEditingController.text = userAddress;
+
+    return Consumer<AppInfo>(builder: (context, appInfo, _) {
+      if (appInfo.pickUpLocation != null &&
+          appInfo.pickUpLocation!.humanReadableAddress != null) {
+        String userAddress = appInfo.pickUpLocation!.humanReadableAddress!;
+        pickUpTextEditingController.text = userAddress;
+      }
+      return Scaffold(
+        body: SingleChildScrollView(
           child: Column(
             children: [
               Card(
@@ -206,12 +186,7 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
                                     controller:
                                         destinationTextEditingController,
                                     onChanged: (inputText) {
-                                      if (inputText != "") {
-                                        placeAutoComplete(inputText);
-                                      } else {
-                                        items.clear();
-                                        setState(() {});
-                                      }
+                                      searchLocation(inputText);
                                     },
                                     decoration: const InputDecoration(
                                         hintText: "Destination Address",
@@ -232,7 +207,9 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
                   ),
                 ),
               ),
-              (dropOffPredictionsPlacesList.isNotEmpty)
+
+              //display prediction results for destination place
+              (dropOffPredictionsPlacesList.length > 0)
                   ? Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 16),
@@ -259,8 +236,8 @@ class _SearchDestinationPageState extends State<SearchDestinationPage> {
                   : Container(),
             ],
           ),
-        );
-      }),
-    );
+        ),
+      );
+    });
   }
 }

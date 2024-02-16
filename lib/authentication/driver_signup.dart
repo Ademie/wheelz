@@ -1,13 +1,14 @@
 import 'dart:io';
+
+import 'package:wheelz/pages/dashboard.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:wheelz/driver/pages/dashboard.dart';
-import 'package:wheelz/methods/common_methods.dart';
-import 'package:wheelz/widgets/loading_dialog.dart';
-import 'driver_login.dart';
+import '../methods/common_methods.dart';
+import '../widgets/loading_dialog.dart';
+import 'login_screen.dart';
 
 class DriverSignUp extends StatefulWidget {
   const DriverSignUp({super.key});
@@ -35,7 +36,8 @@ class _DriverSignUpState extends State<DriverSignUp> {
   checkIfNetworkIsAvailable() {
     cMethods.checkConnectivity(context);
 
-    if (imageFile != null) {
+    if (imageFile != null) //image validation
+    {
       signUpFormValidation();
     } else {
       cMethods.displaySnackBar("Please choose image first.", context);
@@ -77,6 +79,7 @@ class _DriverSignUpState extends State<DriverSignUp> {
     setState(() {
       urlOfUploadedImage;
     });
+
     registerNewDriver();
   }
 
@@ -101,6 +104,7 @@ class _DriverSignUpState extends State<DriverSignUp> {
 
     if (!context.mounted) return;
     Navigator.pop(context);
+
     DatabaseReference usersRef = FirebaseDatabase.instance
         .ref()
         .child("drivers")
@@ -120,10 +124,11 @@ class _DriverSignUpState extends State<DriverSignUp> {
       "phone": userPhoneTextEditingController.text.trim(),
       "id": userFirebase.uid,
       "blockStatus": "no",
+      "type": "driver",
     };
     usersRef.set(driverDataMap);
-    Navigator.push(
-        context, MaterialPageRoute(builder: (c) => const Dashboard()));
+
+    Navigator.push(context, MaterialPageRoute(builder: (c) => Dashboard()));
   }
 
   chooseImageFromGallery() async {
@@ -334,7 +339,7 @@ class _DriverSignUpState extends State<DriverSignUp> {
               TextButton(
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (c) => const DriverLogin()));
+                      MaterialPageRoute(builder: (c) => LoginScreen()));
                 },
                 child: const Text(
                   "Already have an Account? Login Here",

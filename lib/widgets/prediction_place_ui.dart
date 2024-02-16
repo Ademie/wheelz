@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wheelz/global/api.dart';
-import 'package:wheelz/global/singleton.dart';
-import 'package:wheelz/user/appInfo/app_info.dart';
-import 'package:wheelz/user/models/address_model.dart';
-import 'package:wheelz/user/models/prediction_model.dart';
+import 'package:wheelz/appInfo/app_info.dart';
+import 'package:wheelz/global/global_var.dart';
+import 'package:wheelz/methods/common_methods.dart';
+import 'package:wheelz/models/address_model.dart';
+import 'package:wheelz/models/prediction_model.dart';
+import 'package:wheelz/widgets/loading_dialog.dart';
 
 class PredictionPlaceUI extends StatefulWidget {
   PredictionModel? predictedPlaceData;
-  Function? selectDropOff;
 
   PredictionPlaceUI({
     super.key,
     this.predictedPlaceData,
-    this.selectDropOff,
   });
 
   @override
@@ -21,19 +20,50 @@ class PredictionPlaceUI extends StatefulWidget {
 }
 
 class _PredictionPlaceUIState extends State<PredictionPlaceUI> {
+  ///Place Details - Places API
+  fetchClickedPlaceDetails(String placeID) async {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) =>
+          LoadingDialog(messageText: "Getting details..."),
+    );
+
+    String urlPlaceDetailsAPI =
+        "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeID&key=$googleMapKey";
+
+    var responseFromPlaceDetailsAPI =
+        await CommonMethods.sendRequestToAPI(urlPlaceDetailsAPI);
+
+    Navigator.pop(context);
+
+    if (responseFromPlaceDetailsAPI == "error") {
+      return;
+    }
+
+    if (responseFromPlaceDetailsAPI["status"] == "OK") {
+      AddressModel dropOffLocation = AddressModel();
+
+      dropOffLocation.placeName = responseFromPlaceDetailsAPI["result"]["name"];
+      dropOffLocation.latitudePosition =
+          responseFromPlaceDetailsAPI["result"]["geometry"]["location"]["lat"];
+      dropOffLocation.longitudePosition =
+          responseFromPlaceDetailsAPI["result"]["geometry"]["location"]["lng"];
+      dropOffLocation.placeID = placeID;
+
+      Provider.of<AppInfo>(context, listen: false)
+          .updateDropOffLocation(dropOffLocation);
+
+      Navigator.pop(context, "placeSelected");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        AddressModel dropOffLocation = AddressModel();
-        dropOffLocation.placeName = widget.predictedPlaceData!.main_text;
-        dropOffLocation.latitudePosition = widget.predictedPlaceData!.lat;
-        dropOffLocation.longitudePosition = widget.predictedPlaceData!.long;
-        Provider.of<AppInfo>(context, listen: false)
-            .updateDropOffLocation(dropOffLocation);
-
-        Navigator.pop(context);
-        Singleton().dropOff = dropOffLocation;
+        fetchClickedPlaceDetails(
+            widget.predictedPlaceData!.place_id.toString());
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,

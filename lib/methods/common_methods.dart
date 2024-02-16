@@ -1,16 +1,18 @@
 import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-
+import 'package:wheelz/appInfo/app_info.dart';
 import 'package:wheelz/global/global_var.dart';
 import 'package:http/http.dart' as http;
-import 'package:wheelz/user/appInfo/app_info.dart';
-import 'package:wheelz/user/models/address_model.dart';
-import 'package:wheelz/user/models/direction_details.dart';
+import 'package:wheelz/models/address_model.dart';
+
+import '../models/direction_details.dart';
 
 class CommonMethods {
   checkConnectivity(BuildContext context) async {
@@ -44,6 +46,24 @@ class CommonMethods {
     } catch (errorMsg) {
       return "error";
     }
+  }
+
+    turnOffLocationUpdatesForHomePage()
+  {
+    positionStreamHomePage!.pause();
+
+    Geofire.removeLocation(FirebaseAuth.instance.currentUser!.uid);
+  }
+
+  turnOnLocationUpdatesForHomePage()
+  {
+    positionStreamHomePage!.resume();
+
+    Geofire.setLocation(
+      FirebaseAuth.instance.currentUser!.uid,
+      driverCurrentPosition!.latitude,
+      driverCurrentPosition!.longitude,
+    );
   }
 
   ///Reverse GeoCoding

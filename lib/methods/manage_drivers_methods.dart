@@ -1,4 +1,4 @@
-import 'package:wheelz/user/models/online_nearby_drivers.dart';
+import 'package:wheelz/models/online_nearby_drivers.dart';
 
 class ManageDriversMethods {
   static List<OnlineNearbyDrivers> nearbyOnlineDriversList = [];

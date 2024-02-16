@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:wheelz/driver/authentication/driver_signup.dart';
-import 'package:wheelz/driver/pages/dashboard.dart';
-import 'package:wheelz/methods/common_methods.dart';
-import 'package:wheelz/widgets/loading_dialog.dart';
+import 'package:wheelz/authentication/driver_signup.dart';
+import 'package:wheelz/pages/dashboard.dart';
+import '../methods/common_methods.dart';
+import '../widgets/loading_dialog.dart';
 
 class DriverLogin extends StatefulWidget {
   const DriverLogin({super.key});
@@ -173,7 +173,7 @@ class _DriverLoginState extends State<DriverLogin> {
               TextButton(
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (c) => const DriverSignUp()));
+                      MaterialPageRoute(builder: (c) => DriverSignUp()));
                 },
                 child: const Text(
                   "Don\'t have an Account? Register Here",

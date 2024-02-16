@@ -1,26 +1,28 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:wheelz/authentication/signup_screen.dart';
 import 'package:wheelz/global/global_var.dart';
-import 'package:wheelz/user/authentication/user_signup.dart';
-import '../../methods/common_methods.dart';
-import '../pages/user_home.dart';
-import '../../widgets/loading_dialog.dart';
 
-class UserLogin extends StatefulWidget {
-  const UserLogin({super.key});
+import '../methods/common_methods.dart';
+import '../pages/home_page.dart';
+import '../widgets/loading_dialog.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<UserLogin> createState() => _UserLoginState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _UserLoginState extends State<UserLogin> {
+class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
   CommonMethods cMethods = CommonMethods();
 
   checkIfNetworkIsAvailable() {
     cMethods.checkConnectivity(context);
+
     signInFormValidation();
   }
 
@@ -49,28 +51,26 @@ class _UserLoginState extends State<UserLogin> {
     )
             .catchError((errorMsg) {
       Navigator.pop(context);
-      cMethods.displaySnackBar("Invalid email or password", context);
-    }))
-        .user;
-
+      cMethods.displaySnackBar(errorMsg.toString(), context);
+    })).user;
     if (!context.mounted) return;
     Navigator.pop(context);
-
     if (userFirebase != null) {
       DatabaseReference usersRef = FirebaseDatabase.instance
           .ref()
           .child("users")
           .child(userFirebase.uid);
-      usersRef.once().then((snap) {
+      await usersRef.once().then((snap) {
         if (snap.snapshot.value != null) {
           if ((snap.snapshot.value as Map)["blockStatus"] == "no") {
             userName = (snap.snapshot.value as Map)["name"];
+            userPhone = (snap.snapshot.value as Map)["phone"];
             Navigator.push(
-                context, MaterialPageRoute(builder: (c) => const UserHome()));
+                context, MaterialPageRoute(builder: (c) => HomePage()));
           } else {
             FirebaseAuth.instance.signOut();
             cMethods.displaySnackBar(
-                "you are blocked. Contact admin: alizeb875@gmail.com", context);
+                "you are blocked. Contact admin: isijolaademie@gmail.com", context);
           }
         } else {
           FirebaseAuth.instance.signOut();
@@ -98,6 +98,7 @@ class _UserLoginState extends State<UserLogin> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+
               //text fields + button
               Padding(
                 padding: const EdgeInsets.all(22),
@@ -155,11 +156,12 @@ class _UserLoginState extends State<UserLogin> {
               const SizedBox(
                 height: 12,
               ),
+
               //textbutton
               TextButton(
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (c) => const UserSignUp()));
+                      MaterialPageRoute(builder: (c) => SignUpScreen()));
                 },
                 child: const Text(
                   "Don\'t have an Account? Register Here",

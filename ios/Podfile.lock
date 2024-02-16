@@ -1,4 +1,8 @@
 PODS:
+  - assets_audio_player (0.0.1):
+    - Flutter
+  - assets_audio_player_web (0.0.1):
+    - Flutter
   - connectivity_plus (0.0.1):
     - Flutter
     - ReachabilitySwift
@@ -10,6 +14,9 @@ PODS:
   - Firebase/Database (10.18.0):
     - Firebase/CoreOnly
     - FirebaseDatabase (~> 10.18.0)
+  - Firebase/Messaging (10.18.0):
+    - Firebase/CoreOnly
+    - FirebaseMessaging (~> 10.18.0)
   - Firebase/Storage (10.18.0):
     - Firebase/CoreOnly
     - FirebaseStorage (~> 10.18.0)
@@ -22,6 +29,10 @@ PODS:
     - Flutter
   - firebase_database (10.4.0):
     - Firebase/Database (= 10.18.0)
+    - firebase_core
+    - Flutter
+  - firebase_messaging (14.7.10):
+    - Firebase/Messaging (= 10.18.0)
     - firebase_core
     - Flutter
   - firebase_storage (11.6.0):
@@ -50,6 +61,20 @@ PODS:
     - FirebaseCore (~> 10.0)
     - FirebaseSharedSwift (~> 10.0)
     - leveldb-library (~> 1.22)
+  - FirebaseInstallations (10.19.0):
+    - FirebaseCore (~> 10.0)
+    - GoogleUtilities/Environment (~> 7.8)
+    - GoogleUtilities/UserDefaults (~> 7.8)
+    - PromisesObjC (~> 2.1)
+  - FirebaseMessaging (10.18.0):
+    - FirebaseCore (~> 10.0)
+    - FirebaseInstallations (~> 10.0)
+    - GoogleDataTransport (~> 9.2)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.8)
+    - GoogleUtilities/Environment (~> 7.8)
+    - GoogleUtilities/Reachability (~> 7.8)
+    - GoogleUtilities/UserDefaults (~> 7.8)
+    - nanopb (< 2.30910.0, >= 2.30908.0)
   - FirebaseSharedSwift (10.19.0)
   - FirebaseStorage (10.18.0):
     - FirebaseAppCheckInterop (~> 10.0)
@@ -58,10 +83,29 @@ PODS:
     - FirebaseCoreExtension (~> 10.0)
     - GTMSessionFetcher/Core (< 4.0, >= 2.1)
   - Flutter (1.0.0)
-  - flutter_compass (0.0.1):
+  - flutter_geofire (0.0.1):
     - Flutter
+    - GeoFire (~> 4.0)
+  - GeoFire (4.3.0):
+    - GeoFire/Database (= 4.3.0)
+  - GeoFire/Database (4.3.0):
+    - Firebase/Database (~> 10.1)
+    - GeoFire/Utils
+  - GeoFire/Utils (4.3.0)
   - geolocator_apple (1.2.0):
     - Flutter
+  - google_maps_flutter_ios (0.0.1):
+    - Flutter
+    - GoogleMaps (< 9.0)
+  - GoogleDataTransport (9.3.0):
+    - GoogleUtilities/Environment (~> 7.7)
+    - nanopb (< 2.30910.0, >= 2.30908.0)
+    - PromisesObjC (< 3.0, >= 1.2)
+  - GoogleMaps (6.2.1):
+    - GoogleMaps/Maps (= 6.2.1)
+  - GoogleMaps/Base (6.2.1)
+  - GoogleMaps/Maps (6.2.1):
+    - GoogleMaps/Base
   - GoogleUtilities/AppDelegateSwizzler (7.12.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
@@ -77,27 +121,49 @@ PODS:
   - "GoogleUtilities/NSData+zlib (7.12.0)"
   - GoogleUtilities/Reachability (7.12.0):
     - GoogleUtilities/Logger
+  - GoogleUtilities/UserDefaults (7.12.0):
+    - GoogleUtilities/Logger
   - GTMSessionFetcher/Core (3.2.0)
   - image_picker_ios (0.0.1):
     - Flutter
   - leveldb-library (1.22.2)
+  - nanopb (2.30909.1):
+    - nanopb/decode (= 2.30909.1)
+    - nanopb/encode (= 2.30909.1)
+  - nanopb/decode (2.30909.1)
+  - nanopb/encode (2.30909.1)
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - permission_handler_apple (9.1.1):
     - Flutter
   - PromisesObjC (2.3.1)
   - ReachabilitySwift (5.0.0)
   - RecaptchaInterop (100.0.0)
+  - restart_app (0.0.1):
+    - Flutter
+  - url_launcher_ios (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
+  - assets_audio_player (from `.symlinks/plugins/assets_audio_player/ios`)
+  - assets_audio_player_web (from `.symlinks/plugins/assets_audio_player_web/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_database (from `.symlinks/plugins/firebase_database/ios`)
+  - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - firebase_storage (from `.symlinks/plugins/firebase_storage/ios`)
   - Flutter (from `Flutter`)
-  - flutter_compass (from `.symlinks/plugins/flutter_compass/ios`)
+  - flutter_geofire (from `.symlinks/plugins/flutter_geofire/ios`)
+  - GeoFire (from `https://github.com/mrdishant/geofire-objc`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
+  - google_maps_flutter_ios (from `.symlinks/plugins/google_maps_flutter_ios/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - restart_app (from `.symlinks/plugins/restart_app/ios`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
   trunk:
@@ -109,16 +175,25 @@ SPEC REPOS:
     - FirebaseCoreExtension
     - FirebaseCoreInternal
     - FirebaseDatabase
+    - FirebaseInstallations
+    - FirebaseMessaging
     - FirebaseSharedSwift
     - FirebaseStorage
+    - GoogleDataTransport
+    - GoogleMaps
     - GoogleUtilities
     - GTMSessionFetcher
     - leveldb-library
+    - nanopb
     - PromisesObjC
     - ReachabilitySwift
     - RecaptchaInterop
 
 EXTERNAL SOURCES:
+  assets_audio_player:
+    :path: ".symlinks/plugins/assets_audio_player/ios"
+  assets_audio_player_web:
+    :path: ".symlinks/plugins/assets_audio_player_web/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/ios"
   firebase_auth:
@@ -127,25 +202,45 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_core/ios"
   firebase_database:
     :path: ".symlinks/plugins/firebase_database/ios"
+  firebase_messaging:
+    :path: ".symlinks/plugins/firebase_messaging/ios"
   firebase_storage:
     :path: ".symlinks/plugins/firebase_storage/ios"
   Flutter:
     :path: Flutter
-  flutter_compass:
-    :path: ".symlinks/plugins/flutter_compass/ios"
+  flutter_geofire:
+    :path: ".symlinks/plugins/flutter_geofire/ios"
+  GeoFire:
+    :git: https://github.com/mrdishant/geofire-objc
   geolocator_apple:
     :path: ".symlinks/plugins/geolocator_apple/ios"
+  google_maps_flutter_ios:
+    :path: ".symlinks/plugins/google_maps_flutter_ios/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
+  restart_app:
+    :path: ".symlinks/plugins/restart_app/ios"
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
+
+CHECKOUT OPTIONS:
+  GeoFire:
+    :commit: 5054b6cfe35486a23111df37b37df67102243958
+    :git: https://github.com/mrdishant/geofire-objc
 
 SPEC CHECKSUMS:
+  assets_audio_player: edee322b9cb625571b830b35872ead1a295fd917
+  assets_audio_player_web: 19826380c44375761aa0b9053665c1e3fbc3b86b
   connectivity_plus: bf0076dd84a130856aa636df1c71ccaff908fa1d
   Firebase: 414ad272f8d02dfbf12662a9d43f4bba9bec2a06
   firebase_auth: 8e9ec02991ca4659111cc671c84d0c010b6bfb26
   firebase_core: 0af4a2b24f62071f9bf283691c0ee41556dcb3f5
   firebase_database: 5d420ac53c48f3394445c8b83c530a42d149c3d4
+  firebase_messaging: 90e8a6db84b6e1e876cebce4f30f01dc495e7014
   firebase_storage: 2b932fa5461f4efac36a2dcfbe240898b190b5b1
   FirebaseAppCheckInterop: 37884781f3e16a1ba47e7ec80a1e805f987788e3
   FirebaseAuth: 12314b438fa76048540c8fb86d6cfc9e08595176
@@ -154,20 +249,30 @@ SPEC CHECKSUMS:
   FirebaseCoreExtension: c08d14c7b22e07994e876d837e6f58642f340087
   FirebaseCoreInternal: b444828ea7cfd594fca83046b95db98a2be4f290
   FirebaseDatabase: ac770bf7525ff0340b105166037036c0e46c2c7e
+  FirebaseInstallations: 033d199474164db20c8350736842a94fe717b960
+  FirebaseMessaging: 9bc34a98d2e0237e1b121915120d4d48ddcf301e
   FirebaseSharedSwift: f34eeb7d3ea87a34497629b6ca41657beadef76a
   FirebaseStorage: 8333c4b183764cdd170d9539a61322b71c23adff
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  flutter_compass: cbbd285cea1584c7ac9c4e0c3e1f17cbea55e855
-  geolocator_apple: cc556e6844d508c95df1e87e3ea6fa4e58c50401
+  flutter_geofire: bdfbc0c9089638778117d488a9b64b565c277d7a
+  GeoFire: f113536c90f581f89107c31ec1efde1a1cae3115
+  geolocator_apple: 9157311f654584b9bb72686c55fc02a97b73f461
+  google_maps_flutter_ios: 590249c67f34f422122c232f2a626192adbc78ee
+  GoogleDataTransport: 57c22343ab29bc686febbf7cbb13bad167c2d8fe
+  GoogleMaps: 20d7b12be49a14287f797e88e0e31bc4156aaeb4
   GoogleUtilities: 0759d1a57ebb953965c2dfe0ba4c82e95ccc2e34
   GTMSessionFetcher: 41b9ef0b4c08a6db4b7eb51a21ae5183ec99a2c8
   image_picker_ios: 4a8aadfbb6dc30ad5141a2ce3832af9214a705b5
   leveldb-library: f03246171cce0484482ec291f88b6d563699ee06
+  nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
+  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
+  restart_app: 806659942bf932f6ce51c5372f91ce5e81c8c14a
+  url_launcher_ios: bf5ce03e0e2088bad9cc378ea97fa0ed5b49673b
 
-PODFILE CHECKSUM: 7be2f5f74864d463a8ad433546ed1de7e0f29aef
+PODFILE CHECKSUM: 1067524462b8a58634fb3f7f1b858d77c9532051
 
 COCOAPODS: 1.14.3

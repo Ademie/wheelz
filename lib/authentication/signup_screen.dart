@@ -1,19 +1,20 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:wheelz/authentication/login_screen.dart';
 import 'package:wheelz/methods/common_methods.dart';
-import 'package:wheelz/user/authentication/user_login.dart';
-import 'package:wheelz/user/pages/user_home.dart';
+import 'package:wheelz/pages/home_page.dart';
 import 'package:wheelz/widgets/loading_dialog.dart';
 
-class UserSignUp extends StatefulWidget {
-  const UserSignUp({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<UserSignUp> createState() => _UserSignUpState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _UserSignUpState extends State<UserSignUp> {
+class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController userNameTextEditingController = TextEditingController();
   TextEditingController userPhoneTextEditingController =
       TextEditingController();
@@ -23,6 +24,7 @@ class _UserSignUpState extends State<UserSignUp> {
 
   checkIfNetworkIsAvailable() {
     cMethods.checkConnectivity(context);
+
     signUpFormValidation();
   }
 
@@ -50,13 +52,11 @@ class _UserSignUpState extends State<UserSignUp> {
       builder: (BuildContext context) =>
           LoadingDialog(messageText: "Registering your account..."),
     );
-
     final User? userFirebase = (await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
       email: emailTextEditingController.text.trim(),
       password: passwordTextEditingController.text.trim(),
-    )
-            .catchError((errorMsg) {
+    ).catchError((errorMsg) {
       Navigator.pop(context);
       cMethods.displaySnackBar(errorMsg.toString(), context);
     }))
@@ -76,7 +76,7 @@ class _UserSignUpState extends State<UserSignUp> {
     };
     usersRef.set(userDataMap);
 
-    Navigator.push(context, MaterialPageRoute(builder: (c) => const UserHome()));
+    Navigator.push(context, MaterialPageRoute(builder: (c) => HomePage()));
   }
 
   @override
@@ -193,7 +193,7 @@ class _UserSignUpState extends State<UserSignUp> {
               TextButton(
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (c) => const UserLogin()));
+                      MaterialPageRoute(builder: (c) => LoginScreen()));
                 },
                 child: const Text(
                   "Already have an Account? Login Here",
